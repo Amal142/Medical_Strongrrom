@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Request submitted — Medical Strongroom</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='recovery.css') }}"></head>
+<body>
+  <main class="recovery-panel">
+    <span class="eyebrow">REGISTRATION REQUEST</span>
+    <h1>Request submitted</h1>
+    <p>Thank you, {{ full_name }}. Your account is pending administrator approval. You won’t be able to sign in until it is approved.</p>
+    <p class="page-foot"><a class="button button-primary" href="{{ url_for('login_page') }}">Return to sign in</a></p>
+  </main>
+</body>
+</html>

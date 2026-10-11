@@ -1,0 +1,31 @@
+# Python environments and caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Local databases, journals, and backups (may contain patient/staff data)
+medical_strongroom*.db
+medical_strongroom*.db-*
+medical_strongroom*.sqlite
+medical_strongroom*.sqlite3
+*.db-wal
+*.db-shm
+
+# Encrypted USB key files
+*.strongroom-key
+
+# One-off local audit-log cleanup scripts; preserve only in the working copy
+remove_first_remaining_audit_event.py
+remove_listed_bootstrap_events.py
+remove_listed_failed_login_event.py
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/

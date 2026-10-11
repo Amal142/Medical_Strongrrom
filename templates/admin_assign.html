@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head><title>Assign Patients — Medical Strongroom</title>  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Assign patient to clinician</h1>
+  <p>Choose a patient and the treating clinician responsible for their care.</p>
+  {% if error %}<p class="alert">{{ error }}</p>{% endif %}
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Patient
+      <select name="patient_id">
+        {% for p in patients %}<option value="{{ p['id'] }}">{{ p['full_name'] }} ({{ p['mrn'] }})</option>{% endfor %}
+      </select>
+    </label><br>
+    <label>Clinician
+      <select name="clinician_id">
+        {% for c in clinicians %}<option value="{{ c['id'] }}">{{ c['full_name'] }}</option>{% endfor %}
+      </select>
+    </label><br>
+    <button type="submit">Assign</button>
+  </form>
+  <p><a href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+</body>
+</html>

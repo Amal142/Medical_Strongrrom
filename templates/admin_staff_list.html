@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head><title>Staff — Medical Strongroom</title>  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Staff Accounts</h1>
+  <p><a href="{{ url_for('admin_staff_new') }}">+ Create staff account</a> <span class="muted">·</span> New public sign-ups require approval</p>
+  <table border="1" cellpadding="6">
+    <tr><th>Name</th><th>Username</th><th>Role</th><th>Approval</th><th>Status</th><th></th></tr>
+    {% for s in staff %}
+    <tr>
+      <td>{{ s["full_name"] }}</td>
+      <td>{{ s["username"] }}</td>
+      <td>{{ s["role"] }}</td>
+      <td><span class="approval-pill approval-{{ s['approval_status'] }}">{{ s["approval_status"]|title }}</span></td>
+      <td>{{ "Deactivated" if s["locked_until"] == "9999-12-31T00:00:00+00:00" else "Active" }}</td>
+      <td><a href="{{ url_for('admin_staff_detail', staff_id=s['id']) }}">Manage</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p><a href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+</body>
+</html>

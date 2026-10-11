@@ -1,0 +1,44 @@
+/* Consistent controls and spacing for forms throughout the application. */
+form:not(.logout-form){display:grid;gap:16px}
+form:not(.logout-form) br{display:none}
+form:not(.logout-form) label{display:grid;gap:7px;align-items:start;color:#314d55;font-size:.91rem;font-weight:700}
+.field-hint{display:block;margin-top:-10px;color:#647981;font-size:.82rem;line-height:1.5}
+input:not([type=checkbox]):not([type=radio]),select,textarea{display:block;width:100%;min-height:45px;padding:11px 13px;border:1px solid #cbd9d7;border-radius:9px;background:rgba(255,255,255,.94);color:#19323c;font:inherit;line-height:1.45;box-shadow:0 1px 2px rgba(20,55,55,.025);transition:border-color .16s,box-shadow .16s,background .16s}
+input::placeholder,textarea::placeholder{color:#93a4a5;opacity:1}
+input:hover,select:hover,textarea:hover{border-color:#aabfbb}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#087e78;background:#fff;box-shadow:0 0 0 3px rgba(8,126,120,.13)}
+input[type=password],input[type=email],input[type=text],input[type=date],input[type=number]{min-height:46px}
+input[type=file]{min-height:48px;padding:8px;background:#f9fcfb;font-size:.87rem}
+input[type=file]::file-selector-button{margin-right:12px;padding:7px 11px;border:1px solid #d4e2de;border-radius:7px;background:#eaf5f1;color:#176b66;font:inherit;font-weight:700;cursor:pointer}
+input[type=checkbox],input[type=radio]{width:17px;height:17px;accent-color:#087e78;vertical-align:middle}
+select{appearance:auto;cursor:pointer}
+textarea{min-height:110px;resize:vertical}
+form:not(.logout-form) button:not(.button){justify-self:start;min-height:43px;padding:10px 17px;border:0;border-radius:9px;background:#087e78;color:white;font:inherit;font-weight:750;cursor:pointer;transition:background .16s,transform .16s}
+form:not(.logout-form) button:not(.button):hover{background:#06645f;transform:translateY(-1px)}
+form:not(.logout-form) button:focus-visible,a:focus-visible{outline:3px solid rgba(8,126,120,.3);outline-offset:2px}
+body>form:not(.logout-form){width:min(560px,calc(100% - 32px));padding:26px 28px;gap:17px;background:rgba(255,255,255,.96);border:1px solid #dce7e5;border-radius:15px;box-shadow:0 12px 34px rgba(30,66,65,.07)}
+body>form:not(.logout-form) p{margin:0;color:#647981}
+body>form:not(.logout-form) label+br{display:none}
+@media(max-width:600px){body>form:not(.logout-form){width:calc(100% - 24px);padding:20px 17px}form:not(.logout-form){gap:14px}}
+
+/* USB key enrollment: keep related passphrase fields grouped in a clear card. */
+.key-enroll-page{min-height:100vh;padding:42px 18px;display:grid;place-items:center}
+.key-enroll-card{width:min(760px,100%);padding:clamp(24px,5vw,44px);background:rgba(255,255,255,.97);border:1px solid #dce7e5;border-radius:20px;box-shadow:0 18px 50px rgba(30,66,65,.12)}
+.key-enroll-card .eyebrow{margin-bottom:12px}
+.key-enroll-card h1{max-width:600px;margin-bottom:12px}
+.key-enroll-intro{max-width:650px;margin:0;color:#647981;font-size:1rem}
+.key-enroll-section{margin-top:28px;padding:24px;background:#f8fbfa;border:1px solid #e2ece9;border-radius:15px}
+.key-enroll-section-heading{display:flex;align-items:flex-start;gap:13px;padding-bottom:20px;border-bottom:1px solid #e5eeeb}
+.key-enroll-step{flex:0 0 34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#e5f3ef;color:#087e78;font-weight:800}
+.key-enroll-section-heading h2{margin:2px 0 4px;font-size:1.1rem}
+.key-enroll-section-heading p{max-width:570px;margin:0;color:#647981;font-size:.91rem}
+.key-enroll-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:22px 0}
+.key-enroll-fields label{display:grid;align-content:start;gap:7px;color:#314d55;font-size:.9rem;font-weight:700}
+.key-enroll-fields input{width:100%;min-width:0}
+.key-enroll-hint{color:#718487;font-size:.79rem;font-weight:400}
+.key-enroll-submit{min-height:46px;padding:11px 18px;border:0;border-radius:9px;background:#087e78;color:#fff;font:inherit;font-weight:750;cursor:pointer;transition:background .16s,transform .16s}
+.key-enroll-submit:hover{background:#06645f;transform:translateY(-1px)}
+.key-enroll-submit:focus-visible{outline:3px solid rgba(8,126,120,.3);outline-offset:3px}
+.key-enroll-submit:disabled{opacity:.65;cursor:wait;transform:none}
+.key-enroll-status{min-height:1.5em;margin:14px 0 0;color:#8d382b}
+@media(max-width:620px){.key-enroll-page{padding:20px 12px}.key-enroll-card{padding:24px 18px}.key-enroll-section{padding:18px}.key-enroll-fields{grid-template-columns:1fr;gap:15px;margin:18px 0}.key-enroll-submit{width:100%}}

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security keys — Medical Strongroom</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='key-page.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+  <main class="page-shell key-page">
+    <header class="page-header">
+      <div><span class="eyebrow">ACCOUNT SECURITY</span><h1>Your security keys</h1><p class="muted">{{ credentials|length }} registered public key{{ '' if credentials|length == 1 else 's' }}</p></div>
+      <a class="button button-light" href="{{ url_for('dashboard') }}">Back to dashboard</a>
+    </header>
+    <section class="key-setup-card">
+      <div class="key-setup-intro"><span class="step">＋</span><div><h2>Add a USB key</h2><p>Create an encrypted key file for <strong>{{ username }}</strong>. Keep the file on your USB drive and remember its separate passphrase.</p></div></div>
+      <div class="key-setup-fields">
+        <form id="password-form" class="password-step">
+          <label>Confirm your account password<input type="password" id="password" autocomplete="current-password" required></label>
+          <button class="button button-light" type="submit">Verify password</button>
+        </form>
+        <div class="passphrase-grid">
+          <label>New key-file passphrase <span>At least 12 characters</span><input type="password" id="new-key-passphrase" minlength="12" autocomplete="new-password" required></label>
+          <label>Confirm key-file passphrase<input type="password" id="confirm-key-passphrase" minlength="12" autocomplete="new-password" required></label>
+        </div>
+        <button id="save-key" class="button button-primary" type="button" disabled>Create and save the USB key file</button>
+        <p class="key-hint">The passphrase encrypts the private key in your browser. The server receives only its public key and a challenge signature.</p>
+        <p id="status" class="key-status" role="status"></p>
+      </div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='usb_key_enroll.js') }}"></script>
+  <script nonce="{{ csp_nonce() }}">
+  let pending=null; const status=document.getElementById('status');
+  document.getElementById('password-form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    try {
+      let response=await fetch('{{ url_for("security_keys_options") }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('meta[name="csrf-token"]').content},body:JSON.stringify({password:document.getElementById('password').value})});
+      let data=await response.json(); if(!response.ok) throw new Error(data.error);
+      pending=data; document.getElementById('save-key').disabled=false; status.textContent='Password verified. Set a key-file passphrase, then save your key.';
+    } catch(error) { status.textContent=error.message||'USB key setup failed.'; }
+  });
+  document.getElementById('save-key').addEventListener('click',async()=>{
+    if(!pending) return; document.getElementById('save-key').disabled=true;
+    try {
+      await enrollUsbKey(pending.options,pending.challenge_id,'{{ url_for("security_keys_verify") }}',{{ username|tojson }},document.getElementById('new-key-passphrase').value,document.getElementById('confirm-key-passphrase').value);
+      pending=null; status.textContent='USB key registered. Keep its encrypted key file and passphrase secure.';
+    } catch(error) { status.textContent=error.message||'USB key setup failed.'; document.getElementById('save-key').disabled=false; }
+  });
+  </script>
+</body>
+</html>

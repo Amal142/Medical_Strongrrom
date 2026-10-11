@@ -1,0 +1,17 @@
+<!doctype html>
+<html><head><title>Audit log — Medical Strongroom</title>  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Audit log</h1>
+  <p>Security-related events recorded by the application.</p>
+  <table border="1" cellpadding="6">
+    <tr><th>Time (UTC)</th><th>Actor</th><th>Action</th><th>Target</th></tr>
+    {% for e in events %}
+    <tr>
+      <td>{{ e["timestamp"] }}</td><td>{{ e["actor_name"] or "System / unknown account" }}</td>
+      <td>{{ e["action"] }}</td><td>{{ e["target_type"] or "—" }} {{ e["target_id"] or "" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p><a href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+</body></html>

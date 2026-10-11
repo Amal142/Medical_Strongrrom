@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ patient["full_name"] }} — Medical Strongroom</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+  <main class="page-shell">
+    <header class="page-header"><div><span class="eyebrow">PATIENT RECORD</span><h1>{{ patient["full_name"] }}</h1><p class="muted">MRN {{ patient["mrn"] }} <span class="separator">·</span> Date of birth {{ patient["dob"] }}</p></div><a class="button button-primary" href="{{ url_for('note_new', patient_id=patient['id']) }}">＋ New visit note</a></header>
+    <div class="section-title"><div><h2>Clinical notes</h2><p class="muted">Encrypted visit documentation</p></div></div>
+    {% if not notes %}<div class="empty-state"><strong>No notes yet</strong><p>New visit documentation will appear here.</p></div>{% endif %}
+    {% for n in notes %}
+      <article class="note-card">
+        <header class="note-meta"><div><span class="eyebrow">VISIT NOTE</span><p>{{ n["created_at"] }} <span class="separator">·</span> {{ n["author_name"] }}</p></div><a class="button button-light button-small" href="{{ url_for('note_edit', patient_id=patient['id'], note_id=n['id']) }}">Edit</a></header>
+        {% if n["sections"] %}
+          {% set sections = [("Chief concern", "chief_concern"), ("History of present illness", "history"), ("Relevant history", "medical_history"), ("Medications & allergies", "medications_allergies"), ("Review of systems", "review_of_systems"), ("Vital signs", "vitals"), ("Examination / findings", "exam_findings"), ("Assessment", "assessment"), ("Plan", "plan"), ("Follow-up", "follow_up"), ("Additional notes", "additional_notes")] %}
+          <div class="note-sections">
+          {% for label, key in sections %}{% if n["sections"].get(key) %}<section class="note-field"><h3>{{ label }}</h3><p>{{ n["sections"].get(key) }}</p></section>{% endif %}{% endfor %}
+          </div>
+        {% else %}<div class="legacy-note"><p>{{ n["text"] }}</p><span class="muted">Older free-text note</span></div>{% endif %}
+      </article>
+    {% endfor %}
+    <p class="page-foot"><a href="{{ url_for('patients_list') }}">← Back to patients</a></p>
+  </main>
+</body>
+</html>

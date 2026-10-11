@@ -1,0 +1,50 @@
+<!doctype html>
+<html><head><title>USB key Medical Strongroom</title>  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Confirm with your USB key file</h1>
+  <p>Select the encrypted key file for <strong>{{ username }}</strong> from your USB drive. Enter its passphrase to unlock it locally; only its signature is sent to the server.</p>
+  <form id="key-form">
+    <label>Key file <input type="file" id="key-file" accept=".strongroom-key,.json,application/json" required></label>
+    <label>Key-file passphrase <input type="password" id="key-passphrase" autocomplete="current-password" placeholder="Needed for encrypted v2 key files"></label>
+    <button type="submit">Sign challenge</button>
+  </form>
+  <p id="status"></p>
+  <div id="ceremony" data-options="{{ options_json }}" data-challenge-id="{{ challenge_id }}" data-url="{{ verify_url }}" data-csrf="{{ csrf_token() }}"></div>
+  <script nonce="{{ csp_nonce() }}">
+  (() => {
+    const el=document.getElementById('ceremony'), status=document.getElementById('status');
+    const decode=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-s.length%4)%4)),c=>c.charCodeAt(0));
+    const encode=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    async function deriveFileKey(passphrase,salt,iterations){
+      const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(passphrase),'PBKDF2',false,['deriveKey']);
+      return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['decrypt']);
+    }
+    document.getElementById('key-form').addEventListener('submit',async e=>{
+      e.preventDefault(); status.textContent='Signing challenge…';
+      try {
+        const file=document.getElementById('key-file').files[0];
+        const keyFile=JSON.parse(await file.text()), options=JSON.parse(el.dataset.options);
+        if(!['medical-strongroom-usb-key-v1','medical-strongroom-usb-key-v2'].includes(keyFile.format)||!options.credential_ids.includes(keyFile.credential_id)) throw new Error('That key file is not registered to this account.');
+        if(keyFile.username && keyFile.username!=={{ username|tojson }}) throw new Error('That key file belongs to a different user.');
+        let privateDer;
+        if(keyFile.format==='medical-strongroom-usb-key-v2'){
+          const encryption=keyFile.encryption;
+          if(!encryption||encryption.algorithm!=='AES-256-GCM'||encryption.kdf!=='PBKDF2-SHA-256'||encryption.iterations<100000||encryption.iterations>1000000) throw new Error('Unsupported or invalid encrypted key file.');
+          const aesKey=await deriveFileKey(document.getElementById('key-passphrase').value,decode(encryption.salt),encryption.iterations);
+          try { privateDer=await crypto.subtle.decrypt({name:'AES-GCM',iv:decode(encryption.iv)},aesKey,decode(keyFile.encrypted_private_key)); }
+          catch { throw new Error('Incorrect key-file passphrase or damaged key file.'); }
+        } else {
+          // Compatibility for previously issued v1 files; newly enrolled keys use encrypted v2 files.
+          privateDer=decode(keyFile.private_key_pkcs8);
+        }
+        const privateKey=await crypto.subtle.importKey('pkcs8',privateDer,{name:'ECDSA',namedCurve:'P-256'},false,['sign']);
+        const signature=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},privateKey,decode(options.challenge));
+        const response=await fetch(el.dataset.url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':el.dataset.csrf},body:JSON.stringify({challenge_id:el.dataset.challengeId,credential_id:keyFile.credential_id,signature:encode(signature)})});
+        const result=await response.json(); if(!response.ok) throw new Error(result.error||'USB key verification failed.');
+        location.assign(result.redirect);
+      } catch(error) { status.textContent=error.message||'Unable to use this USB key file.'; }
+    });
+  })();
+  </script>
+</body></html>

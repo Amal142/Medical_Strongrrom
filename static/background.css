@@ -1,0 +1,2 @@
+body:not(.dashboard-page){background-image:linear-gradient(rgba(243,247,245,.84),rgba(243,247,245,.9)),url("medical-paper-bg.jpg");background-size:cover;background-position:center;background-attachment:fixed}
+body.dashboard-page{background-image:radial-gradient(ellipse at 85% 0,rgba(228,243,239,.8) 0,transparent 36%),linear-gradient(rgba(244,248,247,.82),rgba(244,248,247,.89)),url("medical-paper-bg.jpg");background-size:cover;background-position:center;background-attachment:fixed}

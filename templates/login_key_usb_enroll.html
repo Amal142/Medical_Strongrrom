@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Set up USB key — Medical Strongroom</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="key-enroll-page">
+  <main class="key-enroll-card">
+    <span class="eyebrow">SECURE SIGN-IN · STEP 1 OF 2</span>
+    <h1>Set up your USB key file</h1>
+    <p class="key-enroll-intro">This account has no key registered. Create an encrypted key file for <strong>{{ username }}</strong>, then save it to a regular USB drive.</p>
+    <section class="key-enroll-section" aria-labelledby="passphrase-heading">
+      <div class="key-enroll-section-heading">
+        <span class="key-enroll-step" aria-hidden="true">1</span>
+        <div><h2 id="passphrase-heading">Protect your key file</h2><p>Choose a separate passphrase. The server receives only the public key and a challenge signature.</p></div>
+      </div>
+      <div class="key-enroll-fields">
+        <label for="new-key-passphrase">Key-file passphrase <span class="key-enroll-hint">At least 12 characters</span>
+          <input type="password" id="new-key-passphrase" minlength="12" autocomplete="new-password" required>
+        </label>
+        <label for="confirm-key-passphrase">Confirm key-file passphrase <span class="key-enroll-hint">Enter the same passphrase again</span>
+          <input type="password" id="confirm-key-passphrase" minlength="12" autocomplete="new-password" required>
+        </label>
+      </div>
+      <button class="key-enroll-submit" id="create-key" type="button">Create and save key file to USB</button>
+    </section>
+    <p class="key-enroll-status" id="status" role="status" aria-live="polite"></p>
+  </main>
+  <div id="ceremony" data-options="{{ options_json }}" data-challenge-id="{{ challenge_id }}" data-url="{{ register_url }}" data-username="{{ username }}"></div>
+  <script src="{{ url_for('static', filename='usb_key_enroll.js') }}"></script>
+  <script nonce="{{ csp_nonce() }}">
+  document.getElementById('create-key').addEventListener('click',async()=>{
+    document.getElementById('create-key').disabled=true;
+    try {
+      const el=document.getElementById('ceremony');
+      const result=await enrollUsbKey(JSON.parse(el.dataset.options),el.dataset.challengeId,el.dataset.url,el.dataset.username,document.getElementById('new-key-passphrase').value,document.getElementById('confirm-key-passphrase').value);
+      location.assign(result.redirect);
+    } catch(error) { document.getElementById('status').textContent=error.message||'Key setup failed. Sign in again and retry.'; document.getElementById('create-key').disabled=false; }
+  });
+  </script>
+</body></html>

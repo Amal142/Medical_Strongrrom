@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workspace — Medical Strongroom</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body class="dashboard-page">
+  <header class="app-bar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">✚</span><span>Medical <strong>Strongroom</strong></span></a>
+    <nav class="app-nav" aria-label="Main navigation">
+      {% if user["role"] in ["clinician", "frontdesk"] %}<a href="{{ url_for('patients_list') }}">Patients</a>{% endif %}
+      {% if user["role"] == "clinician" and user["can_assign_patients"] %}<a href="{{ url_for('assignments_page') }}">Assignments</a>{% endif %}
+      {% if user["role"] == "admin" %}<a href="{{ url_for('admin_staff_list') }}">Staff</a><a href="{{ url_for('admin_audit') }}">Audit log</a>{% endif %}
+      <a href="{{ url_for('security_keys_page') }}">Security keys</a>
+      <form method="post" action="{{ url_for('logout_page') }}" class="logout-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="button button-light">Log out</button></form>
+    </nav>
+  </header>
+  <main class="dashboard-shell">
+    <section class="welcome-panel">
+      <div><span class="eyebrow">SECURE CLINICAL WORKSPACE</span><h1>Welcome, {{ user["full_name"] }}</h1><p>Your workspace is ready. Choose an area to continue.</p></div>
+      <span class="role-chip">{{ user["role"]|replace('_', ' ')|title }}{% if user["role"] == "clinician" and user["can_assign_patients"] %} · Assignment lead{% endif %}</span>
+    </section>
+    <section class="dashboard-section"><div class="section-title"><div><h2>Your workspace</h2><p>Tools available for your account</p></div></div>
+      <div class="dashboard-grid">
+        {% if user["role"] == "admin" %}
+        <a class="dashboard-card" href="{{ url_for('admin_staff_list') }}"><span class="card-icon">♙</span><span class="card-kicker">PEOPLE</span><h3>Manage staff</h3><p>Create and manage clinician and front-desk accounts.</p><span class="card-link">Open staff management <b>→</b></span></a>
+        <a class="dashboard-card" href="{{ url_for('admin_audit') }}"><span class="card-icon">▤</span><span class="card-kicker">OVERSIGHT</span><h3>Audit log</h3><p>Review signed records of activity in the system.</p><span class="card-link">Review activity <b>→</b></span></a>
+        {% elif user["role"] == "frontdesk" %}
+        <a class="dashboard-card" href="{{ url_for('patients_list') }}"><span class="card-icon">♡</span><span class="card-kicker">PATIENT SERVICES</span><h3>Patient directory</h3><p>Add and update patient demographics for clinic workflows.</p><span class="card-link">Open patient directory <b>→</b></span></a>
+        {% else %}
+        <a class="dashboard-card" href="{{ url_for('patients_list') }}"><span class="card-icon">＋</span><span class="card-kicker">CLINICAL CARE</span><h3>My patients</h3><p>Open records for patients assigned to you and document visits.</p><span class="card-link">View assigned patients <b>→</b></span></a>
+        {% if user["can_assign_patients"] %}<a class="dashboard-card" href="{{ url_for('assignments_page') }}"><span class="card-icon">⇄</span><span class="card-kicker">CARE COORDINATION</span><h3>Patient assignments</h3><p>Assign patients to the clinician responsible for their care.</p><span class="card-link">Manage assignments <b>→</b></span></a>{% endif %}
+        {% endif %}
+        <a class="dashboard-card dashboard-card-secondary" href="{{ url_for('security_keys_page') }}"><span class="card-icon">⌑</span><span class="card-kicker">ACCOUNT SECURITY</span><h3>USB security keys</h3><p>Manage the encrypted key files used to confirm sign-ins.</p><span class="card-link">Manage security keys <b>→</b></span></a>
+      </div>
+    </section>
+    <aside class="privacy-banner"><span class="privacy-icon">✓</span><p><strong>Protected workspace</strong><br>Clinical notes are encrypted, and access is limited by your role and patient assignments.</p></aside>
+  </main>
+</body>
+</html>

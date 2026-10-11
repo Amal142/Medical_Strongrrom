@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ "Edit" if note else "New" }} clinical note — Medical Strongroom</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="page-header">
+      <div><span class="eyebrow">CLINICAL RECORD</span><h1>{{ "Edit" if note else "New" }} visit note</h1>
+        <p class="muted">{{ patient["full_name"] }} <span class="separator">·</span> MRN {{ patient["mrn"] }}</p></div>
+      <a class="button button-light" href="{{ url_for('patient_notes', patient_id=patient['id']) }}">Back to record</a>
+    </header>
+    {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+    {% set legacy_edit = note and not note.get('sections') %}
+    <form method="post" class="clinical-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <section class="form-section">
+        <div class="section-heading"><span class="step">01</span><div><h2>Visit &amp; history</h2><p>Capture the reason for today’s visit and relevant context.</p></div></div>
+        <label>Chief concern {% if not legacy_edit %}<span class="required">Required</span>{% endif %}<textarea name="chief_concern" rows="2" {% if not legacy_edit %}required{% endif %} placeholder="Patient’s main concern, in their own words when helpful">{{ note_data.get('chief_concern', '') }}</textarea></label>
+        <label>History of present illness<textarea name="history" rows="4" placeholder="Onset, duration, location, severity, progression, associated symptoms">{{ note_data.get('history', '') }}</textarea></label>
+        <div class="field-grid">
+          <label>Relevant medical / surgical history<textarea name="medical_history" rows="3" placeholder="Relevant conditions, procedures, and context">{{ note_data.get('medical_history', '') }}</textarea></label>
+          <label>Current medications &amp; allergies<textarea name="medications_allergies" rows="3" placeholder="Medication and allergy review, including reactions if known">{{ note_data.get('medications_allergies', '') }}</textarea></label>
+        </div>
+        <label>Review of systems<textarea name="review_of_systems" rows="3" placeholder="Relevant positive and negative symptoms by system">{{ note_data.get('review_of_systems', '') }}</textarea></label>
+      </section>
+
+      <section class="form-section">
+        <div class="section-heading"><span class="step">02</span><div><h2>Examination</h2><p>Record measured observations and relevant findings.</p></div></div>
+        <label>Vital signs<textarea name="vitals" rows="2" placeholder="BP · mmHg; pulse · bpm; temperature · °C; respiratory rate · /min; SpO₂ · %; weight · kg">{{ note_data.get('vitals', '') }}</textarea></label>
+        <label>Physical examination / objective findings<textarea name="exam_findings" rows="4" placeholder="Document relevant findings and examination systems">{{ note_data.get('exam_findings', '') }}</textarea></label>
+      </section>
+
+      <section class="form-section">
+        <div class="section-heading"><span class="step">03</span><div><h2>Assessment &amp; plan</h2><p>Summarize clinical impression, actions, and follow-up.</p></div></div>
+        <label>Assessment {% if not legacy_edit %}<span class="required">Required</span>{% endif %}<textarea name="assessment" rows="3" {% if not legacy_edit %}required{% endif %} placeholder="Clinical impression, working diagnosis, and relevant differential">{{ note_data.get('assessment', '') }}</textarea></label>
+        <label>Plan {% if not legacy_edit %}<span class="required">Required</span>{% endif %}<textarea name="plan" rows="4" {% if not legacy_edit %}required{% endif %} placeholder="Investigations, treatment, counseling, and agreed actions">{{ note_data.get('plan', '') }}</textarea></label>
+        <label>Follow-up<textarea name="follow_up" rows="2" placeholder="Timing, monitoring, and return precautions discussed">{{ note_data.get('follow_up', '') }}</textarea></label>
+        <label>Additional notes<textarea name="additional_notes" rows="3" placeholder="Other relevant documentation">{{ note_data.get('additional_notes', '') }}</textarea></label>
+      </section>
+      <div class="form-actions"><p class="muted">Clinical notes are encrypted when saved.</p><button class="button button-primary" type="submit">Save clinical note</button></div>
+    </form>
+  </main>
+</body>
+</html>

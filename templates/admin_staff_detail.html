@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head><title>{{ member["full_name"] }} — Medical Strongroom</title>  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>{{ member["full_name"] }}</h1>
+  <p>Registration: <strong>{{ member["approval_status"]|title }}</strong></p>
+  {% if member["approval_status"] == "pending" %}
+  <form method="post" class="approval-actions">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" name="action" value="approve_request">Approve registration</button>
+    <button type="submit" name="action" value="reject_request" class="button-danger">Reject request</button>
+  </form>
+  {% endif %}
+  <p>Username: {{ member["username"] }} | Role: {{ member["role"] }}</p>
+  <p>Status: {{ "Deactivated" if member["locked_until"] == "9999-12-31T00:00:00+00:00" else "Active" }}</p>
+  {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="deactivate">
+    <button type="submit">Deactivate account</button>
+  </form>
+
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="reset_password">
+    <label>New password <input type="password" name="new_password" minlength="10" required autocomplete="new-password"></label>
+    <small class="field-hint">Use at least 10 characters, including at least one number and one special character (such as ! or #).</small>
+    <button type="submit">Reset password</button>
+  </form>
+
+  <p><a href="{{ url_for('admin_staff_list') }}">Back to staff list</a></p>
+</body>
+</html>

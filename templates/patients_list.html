@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head><title>Patients — Medical Strongroom</title>  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Patients</h1>
+  <p>Role: {{ user["role"] }}
+    {% if user["role"] == "clinician" %}(showing only patients assigned to you){% endif %}</p>
+
+  {% if user["role"] == "frontdesk" %}
+    <p><a href="{{ url_for('patient_new') }}">+ Add new patient</a></p>
+  {% endif %}
+
+  <table border="1" cellpadding="6">
+    <tr><th>MRN</th><th>Name</th><th>DOB</th><th></th></tr>
+    {% for p in patients %}
+    <tr>
+      <td>{{ p["mrn"] }}</td>
+      <td>{{ p["full_name"] }}</td>
+      <td>{{ p["dob"] }}</td>
+      <td>
+        {% if user["role"] == "clinician" %}
+          <a href="{{ url_for('patient_notes', patient_id=p['id']) }}">View notes</a>
+        {% else %}
+          <a href="{{ url_for('patient_edit', patient_id=p['id']) }}">Edit</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p><a href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+</body>
+</html>
