@@ -58,21 +58,20 @@ def main():
                     conn.execute(f'DELETE FROM "{table}"')  # nosec B608
 
             if "sqlite_sequence" in existing_tables:
-                if "sqlite_sequence" in existing_tables:
-
-                    conn.execute(
-        """
-        DELETE FROM sqlite_sequence
-        WHERE name IN (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        TABLES_TO_CLEAR,
-    )
+                conn.execute(
+                    """
+                    DELETE FROM sqlite_sequence
+                    WHERE name IN (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    TABLES_TO_CLEAR,
+                )
 
             conn.commit()
 
         except Exception:
             conn.rollback()
             raise
+
 
     print(f"Demo data cleared. Backup saved at: {backup_path}")
 
