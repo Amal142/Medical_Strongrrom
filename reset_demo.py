@@ -58,11 +58,15 @@ def main():
                     conn.execute(f'DELETE FROM "{table}"')  # nosec B608
 
             if "sqlite_sequence" in existing_tables:
-                placeholders = ", ".join("?" for _ in TABLES_TO_CLEAR)
-                conn.execute(
-                    f"DELETE FROM sqlite_sequence WHERE name IN ({placeholders})",
-                    TABLES_TO_CLEAR,
-                )
+                if "sqlite_sequence" in existing_tables:
+
+                    conn.execute(
+        """
+        DELETE FROM sqlite_sequence
+        WHERE name IN (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        TABLES_TO_CLEAR,
+    )
 
             conn.commit()
 
