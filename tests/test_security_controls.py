@@ -31,7 +31,9 @@ from audit import list_events, log_event
 
 
 class SecurityControlsTests(unittest.TestCase):
-    password = "SyntheticPass9!"
+    import os
+
+    password = os.environ["TEST_PASSWORD"]
 
     def setUp(self):
         self.temporary_directory = tempfile.TemporaryDirectory()
